@@ -8,6 +8,7 @@ import dev.tungnesium.Theme;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.scoreboard.ScoreboardEntry;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.Scoreboard;
@@ -23,6 +24,8 @@ public final class SidebarRenderer {
 
     public static void render(DrawContext ctx, ScoreboardObjective objective) {
         MinecraftClient mc = MinecraftClient.getInstance();
+        // while the Esc menu shows the standings on both sides, hide the sidebar so they don't overlap
+        if (mc.currentScreen instanceof GameMenuScreen) return;
         TextRenderer tr = mc.textRenderer;
         Scoreboard sb = objective.getScoreboard();
 

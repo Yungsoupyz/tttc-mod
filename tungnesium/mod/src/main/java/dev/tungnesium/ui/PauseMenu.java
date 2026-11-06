@@ -1,5 +1,7 @@
 package dev.tungnesium.ui;
 
+import java.util.List;
+
 import dev.tungnesium.Net;
 import dev.tungnesium.StandingsData;
 import dev.tungnesium.Teams;
@@ -10,14 +12,20 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
-/** Esc menu: warm top line, a Standings button and a small top-teams panel. */
+/**
+ * Esc menu: a Standings button, and the event standings down both sides:
+ * places 1-5 on the left, 6-10 on the right.
+ */
 public final class PauseMenu {
     private PauseMenu() {}
+
+    private static final int ROW_H = 13;
 
     public static void register() {
         ScreenEvents.AFTER_INIT.register((client, screen, w, h) -> {
@@ -30,27 +38,55 @@ public final class PauseMenu {
     }
 
     private static void draw(DrawContext ctx, int width) {
-        MinecraftClient mc = MinecraftClient.getInstance();
         ctx.fill(0, 0, width, 2, Theme.ACCENT);
-        if (!StandingsData.loaded || width < 360) return;
+        if (!StandingsData.loaded || width < 440) return;
 
-        int x = 6;
-        int y = 32;
-        int w = 118;
-        int rows = Math.min(5, StandingsData.teams.size());
-        Theme.panel(ctx, x, y, w, 16 + rows * 11);
-        ctx.fill(x, y, x + w, y + 13, Theme.HEADER);
-        ctx.drawTextWithShadow(mc.textRenderer, Text.literal("Top teams"), x + 5, y + 3, Theme.GOLD);
-        int ry = y + 16;
-        int rank = 1;
-        for (StandingsData.TeamRow r : StandingsData.teams) {
-            if (rank > rows) break;
+        List<StandingsData.TeamRow> all = StandingsData.teams;
+        int n = all.size();
+        if (n == 0) return;
+
+        List<StandingsData.TeamRow> left = all.subList(0, Math.min(5, n));
+        panel(ctx, 6, 32, left, 1, false, width);
+        if (n > 5) {
+            List<StandingsData.TeamRow> right = all.subList(5, Math.min(10, n));
+            panel(ctx, width - 6, 32, right, 6, true, width);
+        }
+    }
+
+    /** anchorX is the left edge for the left panel, or the right edge when alignRight is true. */
+    private static void panel(DrawContext ctx, int anchorX, int y, List<StandingsData.TeamRow> rows, int firstRank,
+                              boolean alignRight, int screenWidth) {
+        TextRenderer tr = MinecraftClient.getInstance().textRenderer;
+
+        int w = 130;
+        for (StandingsData.TeamRow r : rows) {
             Teams.Info i = Teams.info(r.team());
-            ctx.fill(x + 3, ry, x + 5, ry + 9, i.color());
-            ctx.drawTextWithShadow(mc.textRenderer, rank + ". " + mc.textRenderer.trimToWidth(i.name(), 66), x + 8, ry, Theme.TEXT);
-            String p = String.valueOf(r.points());
-            ctx.drawTextWithShadow(mc.textRenderer, p, x + w - 4 - mc.textRenderer.getWidth(p), ry, Theme.GOLD);
-            ry += 11;
+            String label = (i.icon().isEmpty() ? "" : i.icon() + " ") + i.name();
+            w = Math.max(w, 30 + tr.getWidth(label) + 14 + tr.getWidth(String.format("%,d", r.points())));
+        }
+        w = Math.min(w, 180);
+        int x = alignRight ? anchorX - w : anchorX;
+        int h = 16 + rows.size() * ROW_H + 3;
+
+        Theme.panel(ctx, x, y, w, h);
+        ctx.fill(x, y, x + w, y + 13, Theme.HEADER);
+        String title = firstRank == 1 ? "Standings 1-" + rows.size() : "Standings " + firstRank + "-" + (firstRank + rows.size() - 1);
+        ctx.drawTextWithShadow(tr, title, x + 5, y + 3, Theme.GOLD);
+
+        String own = Teams.ownTeamName();
+        int ry = y + 16;
+        int rank = firstRank;
+        for (StandingsData.TeamRow r : rows) {
+            Teams.Info i = Teams.info(r.team());
+            boolean mine = Teams.same(own, r.team());
+            if (mine) ctx.fill(x + 2, ry - 1, x + w - 2, ry + ROW_H - 2, 0xC0805010);
+            ctx.fill(x + 3, ry - 1, x + 5, ry + ROW_H - 2, i.color());
+            ctx.drawTextWithShadow(tr, rank + ".", x + 8, ry + 1, rank == 1 ? Theme.GOLD : Theme.MUTED);
+            String label = (i.icon().isEmpty() ? "" : i.icon() + " ") + i.name();
+            ctx.drawTextWithShadow(tr, label, x + 26, ry + 1, mine ? Theme.GOLD : i.color());
+            String p = String.format("%,d", r.points());
+            ctx.drawTextWithShadow(tr, p, x + w - 5 - tr.getWidth(p), ry + 1, Theme.GOLD);
+            ry += ROW_H;
             rank++;
         }
     }

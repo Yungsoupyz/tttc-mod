@@ -1,10 +1,13 @@
 package dev.tungnesium.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import dev.tungnesium.StandingsData;
 import dev.tungnesium.Teams;
@@ -41,10 +44,24 @@ public final class TabRenderer {
         PlayerListHud hud = mc.inGameHud.getPlayerListHud();
         int sh = ctx.getScaledWindowHeight();
 
-        // group by scoreboard team
+        // Group by scoreboard team. Many event servers hide players from the vanilla list ("unlisted"),
+        // so we also build the teams from scoreboard membership instead of trusting the listed flag.
         Map<String, List<PlayerListEntry>> groups = new HashMap<>();
+        Set<PlayerListEntry> seen = Collections.newSetFromMap(new IdentityHashMap<>());
         int count = 0;
+        if (mc.world != null) {
+            for (Team t : mc.world.getScoreboard().getTeams()) {
+                for (String member : t.getPlayerList()) {
+                    PlayerListEntry e = handler.getPlayerListEntry(member);
+                    if (e != null && seen.add(e)) {
+                        groups.computeIfAbsent(t.getName(), k -> new ArrayList<>()).add(e);
+                        count++;
+                    }
+                }
+            }
+        }
         for (PlayerListEntry e : handler.getListedPlayerListEntries()) {
+            if (!seen.add(e)) continue;
             Team t = e.getScoreboardTeam();
             groups.computeIfAbsent(t == null ? "" : t.getName(), k -> new ArrayList<>()).add(e);
             count++;
