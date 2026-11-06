@@ -1,0 +1,190 @@
+# ===================== Tungnesium plugin config =====================
+# Edit, then run  /tungnesium reload   (no restart needed)
+
+event-name: "Tungnesium Event"
+discord: "https://discord.gg/YOUR-INVITE"
+
+# ---------------- Joining / mod requirement ----------------
+join:
+  # Players must have the Tungnesium mod. If it does not answer in this many seconds they are kicked.
+  handshake-timeout-seconds: 20
+  not-installed-message: "You need the Tungnesium mod to play this event. Download it here: {discord}"
+
+# ---------------- Auto update ----------------
+update:
+  # Newest mod version. Players on an older one get an "Update now" screen.
+  latest-version: "1.0.0"
+  # Direct download link of the NEW tungnesium-X.Y.Z.jar. Must be https and on github.com or Discord's CDN
+  # (cdn.discordapp.com). Leave empty to disable the in-game download.
+  url: ""
+  # SHA-256 of that jar. REQUIRED, the client refuses the file without it.
+  # Linux/Mac: sha256sum tungnesium-X.Y.Z.jar    Windows: certutil -hashfile tungnesium-X.Y.Z.jar SHA256
+  sha256: ""
+  # Kick players who are on an old version (after the grace period so they can download it).
+  enforce-latest: true
+  grace-seconds: 90
+  outdated-message: "Your Tungnesium mod is outdated (you have {have}, need {need}). Update and rejoin: {discord}"
+
+# ---------------- Mod check ----------------
+# NOTE: this runs on the player's own computer, so a determined cheater can fake it. It catches honest
+# mistakes and casual cheaters, it is not proof. Back it up with staff watching.
+modcheck:
+  enabled: true
+  # denylist  = block mods/packs listed below, allow everything else   (recommended)
+  # allowlist = ONLY allow the mods in allow-ids, kick for anything else (strict)
+  mode: denylist
+  # kick = remove the player, warn = only alert staff
+  action: kick
+  kick-message: "Not allowed: {reasons}. Remove it and rejoin. Questions? {discord}"
+  # exact mod ids
+  deny-ids:
+    - meteor-client
+    - wurst
+    - liquidbounce
+    - aristois
+    - impact
+    - futureclient
+    - bleachhack
+    - rusherhack
+    - thunderhack
+    - salhack
+    - kamiblue
+    - kami-blue
+    - sigma
+    - 3arthh4ck
+    - phobos
+    - konas
+    - gamesense
+    - lambda
+  # anything whose id or display name CONTAINS one of these (lowercase)
+  deny-contains:
+    - xray
+    - x-ray
+    - killaura
+    - autoclicker
+    - auto-clicker
+    - freecam
+    - nuker
+    - hacked client
+  # enabled resource packs whose id or name contains one of these (X-ray packs)
+  deny-packs:
+    - xray
+    - x-ray
+    - x ray
+  # only used when mode is allowlist. A trailing * matches any ending.
+  allow-ids:
+    - minecraft
+    - java
+    - fabricloader
+    - fabric-*
+    - fabric
+    - tungnesium
+    - mixinextras
+    - sodium
+    - lithium
+    - iris
+    - indium
+    - ferritecore
+    - modmenu
+    - entityculling
+    - immediatelyfast
+    - moreculling
+    - dynamic_fps
+    - logical_zoom
+    - appleskin
+    - sodium-extra
+    - reeses-sodium-options
+    - sodiumextras
+    - yet_another_config_lib_v3
+    - cloth-config
+    - cloth-basic-math
+
+# ---------------- Teams ----------------
+# The key (red_rabbits) is just a label. Change name / color / icon freely and run /tungnesium reload.
+#   scoreboard-team : the REAL scoreboard team name your datapacks use (/team add <name>)
+#   holder          : the score holder that stores this team's points in objectives (defaults to scoreboard-team)
+#   icon            : optional text shown before the name, e.g. a glyph from your resource pack like ""
+teams:
+  red_rabbits:
+    name: "Red Rabbits"
+    color: "#E5484D"
+    icon: ""
+    scoreboard-team: "red_rabbits"
+  orange_ocelots:
+    name: "Orange Ocelots"
+    color: "#F08A24"
+    icon: ""
+    scoreboard-team: "orange_ocelots"
+  yellow_yaks:
+    name: "Yellow Yaks"
+    color: "#F5D90A"
+    icon: ""
+    scoreboard-team: "yellow_yaks"
+  lime_llamas:
+    name: "Lime Llamas"
+    color: "#A3E635"
+    icon: ""
+    scoreboard-team: "lime_llamas"
+  green_geckos:
+    name: "Green Geckos"
+    color: "#2FA84F"
+    icon: ""
+    scoreboard-team: "green_geckos"
+  cyan_coyotes:
+    name: "Cyan Coyotes"
+    color: "#22C5D8"
+    icon: ""
+    scoreboard-team: "cyan_coyotes"
+  aqua_axolotls:
+    name: "Aqua Axolotls"
+    color: "#5EEAD4"
+    icon: ""
+    scoreboard-team: "aqua_axolotls"
+  blue_bats:
+    name: "Blue Bats"
+    color: "#3B82F6"
+    icon: ""
+    scoreboard-team: "blue_bats"
+  purple_pandas:
+    name: "Purple Pandas"
+    color: "#A855F7"
+    icon: ""
+    scoreboard-team: "purple_pandas"
+  pink_parrots:
+    name: "Pink Parrots"
+    color: "#F472B6"
+    icon: ""
+    scoreboard-team: "pink_parrots"
+
+# ---------------- Standings ----------------
+# Read from the MAIN scoreboard (where your datapacks/Skript keep scores).
+standings:
+  push-interval-seconds: 15
+  # Objective holding each team's total points. Leave "" to add up the games below instead.
+  team-total-objective: ""
+  # Objective holding each player's total points. Leave "" to add up the games below instead.
+  player-total-objective: ""
+
+# One entry per game. The key is the id you use in /tungnesium loading <id> (and the loading art file name).
+# team-objective / player-objective are scoreboard objective names; leave "" if the game has none.
+games:
+  ace_race:
+    name: "Ace Race"
+    team-objective: ""
+    player-objective: ""
+  battle_box:
+    name: "Battle Box"
+    team-objective: ""
+    player-objective: ""
+  bingo_but_fast:
+    name: "Bingo But Fast"
+    team-objective: ""
+    player-objective: ""
+  parkour_warrior:
+    name: "Parkour Warrior"
+    team-objective: ""
+    player-objective: ""
+  pitch_perfect:
+    name: "Pitch Perfect"
+    team-objective: ""
+    player-objective: ""

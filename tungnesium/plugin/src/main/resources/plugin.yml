@@ -1,0 +1,26 @@
+name: Tungnesium
+main: dev.tungnesium.plugin.TungnesiumPlugin
+version: ${version}
+api-version: '1.21'
+description: Server side of the Tungnesium client mod (mod check, loading screens, standings, updates).
+commands:
+  tungnesium:
+    description: Tungnesium admin commands
+    aliases: [tung]
+    permission: tungnesium.admin
+    usage: /tungnesium <reload|loading|clearloading|events|standings|status|mods>
+  events:
+    description: Open the standings screen
+    aliases: [standings]
+    permission: tungnesium.events
+permissions:
+  tungnesium.admin:
+    default: op
+  tungnesium.events:
+    default: true
+  tungnesium.bypass:
+    description: Skips the mod check (use for staff who test with other mods)
+    default: false
+  tungnesium.alerts:
+    description: Gets a chat alert when someone fails the mod check
+    default: op
