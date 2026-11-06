@@ -14,7 +14,8 @@ import net.fabricmc.loader.api.FabricLoader;
 public final class TungConfig {
     private TungConfig() {}
 
-    public static boolean tab = true;
+    /** Off by default: the server already has its own tab list (BMCCTab). Players can switch ours on with the keybind. */
+    public static boolean tab = false;
     public static boolean scoreboard = true;
     public static boolean pauseTheme = true;
 
